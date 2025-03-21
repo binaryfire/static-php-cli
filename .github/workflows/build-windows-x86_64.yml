@@ -91,7 +91,13 @@ jobs:
 
       # Run build command with icon for micro
       - if: ${{ inputs.build-micro == true }}
-        run: ./bin/spc build "${{ inputs.extensions }}" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_BUILD_CLI }} --build-micro --with-micro-logo=icon.ico ${{ env.SPC_BUILD_FPM }}
+        run: |
+          Write-Host "Current directory contents:"
+          Get-ChildItem -Path "." -Force
+          Write-Host "Testing if icon file exists:"
+          Test-Path -Path "icon.ico" -PathType Leaf
+          Write-Host "Starting build with icon..."
+          ./bin/spc build "${{ inputs.extensions }}" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_BUILD_CLI }} --build-micro --with-micro-logo=icon.ico ${{ env.SPC_BUILD_FPM }}
 
       # Run build command without icon (when micro is not being built)
       - if: ${{ inputs.build-micro != true }}
