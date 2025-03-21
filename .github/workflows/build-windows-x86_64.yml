@@ -85,8 +85,17 @@ jobs:
       - if: steps.cache-download.outputs.cache-hit != 'true'
         run: ./bin/spc download --with-php="${{ inputs.version }}" --for-extensions="${{ inputs.extensions }}" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_PRE_BUILT }}
 
-      # Run build command
-      - run: ./bin/spc build "${{ inputs.extensions }}" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_BUILD_CLI }} ${{ env.SPC_BUILD_MICRO }} ${{ env.SPC_BUILD_FPM }}
+      - name: Copy test icon
+        run: |
+          Copy-Item -Path "assets/icon.ico" -Destination "."
+
+      # Run build command with icon for micro
+      - if: ${{ inputs.build-micro == true }}
+        run: ./bin/spc build "${{ inputs.extensions }}" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_BUILD_CLI }} --build-micro --with-micro-logo=icon.ico ${{ env.SPC_BUILD_FPM }}
+
+      # Run build command without icon (when micro is not being built)
+      - if: ${{ inputs.build-micro != true }}
+        run: ./bin/spc build "${{ inputs.extensions }}" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_BUILD_CLI }} ${{ env.SPC_BUILD_MICRO }} ${{ env.SPC_BUILD_FPM }}
 
       # Upload cli executable
       - if: ${{ inputs.build-cli == true }}
